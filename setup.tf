@@ -1,6 +1,8 @@
 
 # AWS Region where this application will be deployed:
-variable "aws_region" {}
+variable "aws_region" {
+  default = "us-east-1"
+}
 # variable "aws_profile" {}
 
 provider "aws" {
