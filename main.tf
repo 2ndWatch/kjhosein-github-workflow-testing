@@ -6,9 +6,9 @@ resource "aws_s3_bucket_object" "folder" {
   source = "/dev/null"
 }
 
-resource "aws_s3_bucket_object" "file7" {
+resource "aws_s3_bucket_object" "file8" {
   bucket = "kjh-test-bucket-tagging"
-  key    = "foldertest2/keep7"
+  key    = "foldertest2/keep8"
   source = "/dev/null"
 }
 
