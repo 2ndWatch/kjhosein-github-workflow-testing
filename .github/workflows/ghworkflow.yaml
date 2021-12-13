@@ -80,7 +80,7 @@ jobs:
 
           </details>
 
-          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ jobs.kjh-testing.environment }}\` `;
+          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ env.environment }}\` `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
