@@ -1,0 +1,147 @@
+---
+# Workflow based on Hashicorp's sample via
+#   https://learn.hashicorp.com/tutorials/terraform/github-actions?in=terraform/automation
+
+name: "GitHub Actions - testing"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  kjh-testing:
+    name: KJH Testing
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    strategy:
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Current working dir
+      run: |
+        pwd
+        echo "repo_name=${{github.repository}}" >> $GITHUB_ENV
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        # Disable the setup-terraform wrapper and pass outputs using files instead.
+        # This is to accommodate very large Terraform plan and apply outputs.
+        terraform_wrapper: false
+        terraform_version: ${{ secrets.TERRAFORM_VERSION }}
+
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+    - name: Terraform Plan
+      id: plan
+      if: github.event_name == 'pull_request'
+      run: |
+        terraform plan -no-color 2>&1 | tee /tmp/tfplan.txt
+        sed -i '/Refreshing state.../d' /tmp/tfplan.txt
+      continue-on-error: true
+    - name: Update Pull Request with Terraform Plan output
+      uses: actions/github-script@0.9.0
+      if: github.event_name == 'pull_request'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require("fs");
+          const plan = fs.readFileSync("/tmp/tfplan.txt", "utf8");
+          const output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+          #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
+          #### Terraform Plan 📖 \`${{ steps.plan.outcome }}\`
+          #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
+
+          <details><summary>Show Plan</summary>
+
+          \`\`\`\n
+          ${ plan }
+          \`\`\`
+
+          </details>
+
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+    - name: Terraform Plan Status
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+    - name: Terraform Apply
+      id: apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        # Write TF Apply output to a file:
+        terraform apply -auto-approve -no-color 2>&1 | tee /tmp/tfapply.txt
+
+        # Remove lines showing TF state refreshes to reduce file size"
+        sed -i '/Refreshing state.../d' /tmp/tfapply.txt
+
+        # Remove any TF Outputs at the end:
+        sed -i '/Outputs/Q' /tmp/tfapply.txt
+    - name: Get Pull Request Number
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: jwalton/gh-find-current-pr@v1
+      id: getPRnumber
+      with:
+        # Can be "open", "closed", or "all".  Defaults to "open".
+        state: all
+      # This will echo "Your PR is 7", or be skipped if there is no current PR.
+    - name: Update Pull Request with Terraform Apply  
+      if: success() && steps.getPRnumber.outputs.number
+      env:
+        PR_ISSUE_NUMBER: ${{ steps.getPRnumber.outputs.pr }}
+      run: |
+        echo "The PR number is: $PR_ISSUE_NUMBER"
+
+        tf_output=$(cat /tmp/tfapply.txt)
+
+        # Create the initial body for the comment:
+        escaped_body="<details><summary>Show Terraform Apply:</summary>\n\n\`\`\`\n${tf_output} \n\`\`\`\n</details>\n\n *Pushed by @${{ github.actor }}. Workflow: \`${{ github.workflow }}\` *"
+
+        # Un-escape comment body so it retains \n:
+        printf -v unescaped_body %b "$escaped_body"
+
+        # DEBUG: echo comment body
+        # echo "unescaped_body is..."
+        # echo "$unescaped_body"
+
+        # Use jq to construct JSON input to curl:
+        jq_comment_body=$(jq --null-input -M \
+          --arg body "$unescaped_body" \
+          '{"body": $body}' \
+        )
+
+        # DEBUG: jq_comment_body
+        # echo "jq_comment_body is..."
+        # echo "$jq_comment_body"
+
+        curl -s \
+          -X POST \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/${{ env.repo_name }}/issues/$PR_ISSUE_NUMBER/comments" \
+          -d "${jq_comment_body}"
