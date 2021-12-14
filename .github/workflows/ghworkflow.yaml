@@ -5,6 +5,7 @@
 name: "GitHub Actions - testing"
 
 on:
+  deployment:
   push:
     branches:
       - main
@@ -86,7 +87,6 @@ jobs:
 
           <details>All of Github.event context:
           \n
-          ${GITHUB_EVENT_CONTEXT}
           ${{ github.event.deployment.environment }}
           </details>
 
