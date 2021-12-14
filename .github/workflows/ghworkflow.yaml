@@ -35,6 +35,7 @@ jobs:
       run: |
         pwd
         echo "repo_name=${{github.repository}}" >> $GITHUB_ENV
+        echo "job name is: ${{ jobs.kjh-testing.name }}"
 
     - name: Dump context
       uses: crazy-max/ghaction-dump-context@v1
@@ -85,12 +86,7 @@ jobs:
 
           </details>
 
-          <details>All of Github.event context:
-          \n
-          ${{ github.event.deployment.environment }}
-          </details>
-
-          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ env.depl_env }}\` `;
+          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\` `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
