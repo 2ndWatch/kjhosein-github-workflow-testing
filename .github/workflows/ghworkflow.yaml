@@ -36,6 +36,7 @@ jobs:
         pwd
         echo "repo_name=${{github.repository}}" >> $GITHUB_ENV
         echo "Github context is $GITHUB_CONTEXT" # DEBUG
+        echo "depl_env=${{github.event.deployment.environment}}" >> $GITHUB_ENV
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
@@ -85,11 +86,11 @@ jobs:
 
           <details>All of Github.event context:
           \n
-          $GITHUB_EVENT_CONTEXT
+          ${GITHUB_EVENT_CONTEXT}
           ${{ github.event.deployment.environment }}
           </details>
 
-          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ github.event.deployment.environment }}\` `;
+          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ env.depl_env }}\` `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
