@@ -18,7 +18,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GITHUB_CONTEXT: ${{ toJson(github) }}
+      # GITHUB_CONTEXT: ${{ toJson(github) }}
       GITHUB_EVENT_CONTEXT: ${{ toJson(github.event) }}
     strategy:
       fail-fast: false
@@ -86,6 +86,7 @@ jobs:
           <details>All of Github.event context:
           \n
           $GITHUB_EVENT_CONTEXT
+          ${{ github.event.deployment.environment }}
           </details>
 
           Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ github.event.deployment.environment }}\` `;
