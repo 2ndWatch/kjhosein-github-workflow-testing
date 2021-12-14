@@ -5,7 +5,6 @@
 name: "GitHub Actions - testing"
 
 on:
-  deployment:
   push:
     branches:
       - main
@@ -20,7 +19,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       # GITHUB_CONTEXT: ${{ toJson(github) }}
-      GITHUB_EVENT_CONTEXT: ${{ toJson(github.event) }}
+      # GITHUB_EVENT_CONTEXT: ${{ toJson(github.event) }}
     strategy:
       fail-fast: false
     defaults:
@@ -37,7 +36,7 @@ jobs:
         pwd
         echo "repo_name=${{github.repository}}" >> $GITHUB_ENV
         # echo "Github context is $GITHUB_CONTEXT" # DEBUG
-        echo "depl_env=${{github.event.deployment.environment}}" >> $GITHUB_ENV # DEBUG
+        echo "depl_env=${{github.event.deployment.environment}}" >> $GITHUB_ENV # DEBUG, not going to work
         echo "job context is: "
         echo ${{ toJson(job) }}
 
