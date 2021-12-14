@@ -14,11 +14,10 @@ jobs:
   kjh-testing:
     name: KJH Testing
     runs-on: ubuntu-latest
-    environment: $DEPLOY_ENVIRONMENT
+    environment: prod
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      DEPLOYMENT_ENVIRONMENT: prod
       GITHUB_CONTEXT: ${{ toJson(github) }}
     strategy:
       fail-fast: false
@@ -81,6 +80,11 @@ jobs:
           ${ plan }
           \`\`\`
 
+          </details>
+
+          <details>All of Github.event context:
+          \n
+          ${{ github.event }}
           </details>
 
           Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`${{ github.event.deployment.environment }}\` `;
