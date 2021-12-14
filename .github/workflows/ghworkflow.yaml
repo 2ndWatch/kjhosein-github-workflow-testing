@@ -85,7 +85,7 @@ jobs:
 
           </details>
 
-          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job Container info: ${{ toJson(job.container) }}, Job Status: ${{ job.status }} `;
+          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job  info: ${{ toJson(job) }}, Job Status: ${{ job.status }} `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
