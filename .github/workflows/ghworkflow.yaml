@@ -18,6 +18,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GITHUB_CONTEXT: ${{ toJson(github) }}
     strategy:
       fail-fast: false
     defaults:
@@ -33,7 +34,7 @@ jobs:
       run: |
         pwd
         echo "repo_name=${{github.repository}}" >> $GITHUB_ENV
-        echo "Github context is ${{github}}" # DEBUG
+        echo "Github context is $GITHUB_CONTEXT" # DEBUG
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
