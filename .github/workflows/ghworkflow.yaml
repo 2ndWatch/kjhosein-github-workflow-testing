@@ -85,7 +85,7 @@ jobs:
 
           </details>
 
-          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job: ${{ jobs.kjh-testing.name }} `;
+          Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job Container ID: ${{ job.container.id }} `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
