@@ -33,6 +33,7 @@ jobs:
       run: |
         pwd
         echo "repo_name=${{github.repository}}" >> $GITHUB_ENV
+        echo "Github context is ${{github}}" # DEBUG
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
