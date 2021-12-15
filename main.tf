@@ -1,5 +1,8 @@
 # S3 object creation
 
+variable "folder_file" {
+  default = "foldertest/keep1"
+}
 resource "aws_s3_bucket_object" "folder" {
   bucket = "kjh-test-bucket-tagging"
   key    = "foldertest2/.keep"
@@ -8,7 +11,7 @@ resource "aws_s3_bucket_object" "folder" {
 
 resource "aws_s3_bucket_object" "file9" {
   bucket = "kjh-test-bucket-tagging"
-  key    = "foldertest2/keep9"
+  key    = var.folder_file
   source = "/dev/null"
 }
 
