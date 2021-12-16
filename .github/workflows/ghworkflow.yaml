@@ -47,7 +47,7 @@ jobs:
 
     - name: Terraform Format
       id: fmt
-      run: terraform fmt -diff
+      run: echo "::set-output name=tf_fmt_output::$(terraform fmt -diff)"
 
     - name: Terraform Init
       id: init
@@ -68,14 +68,14 @@ jobs:
       continue-on-error: true
 
     - name: Update Pull Request with Terraform Plan output
-      uses: actions/github-script@0.9.0
+      uses: actions/github-script@v3.0.0
       if: github.event_name == 'pull_request'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require("fs");
           const plan = fs.readFileSync("/tmp/tfplan.txt", "utf8");
-          const output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+          let output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
           #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
           #### Terraform Plan 📖 \`${{ steps.plan.outcome }}\`
           #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
@@ -90,6 +90,11 @@ jobs:
 
           <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
 
+          var tf_format_output = "${{ steps.fmt.outputs.tf_fmt_output }}";
+          if (tf_format_output.length !== 0) {
+            output += `\n\n <strong>FYI: Terraform Format found issues. Please fix before applying.</strong>`;
+          }
+          
           github.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
