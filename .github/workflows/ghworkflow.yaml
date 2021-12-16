@@ -18,8 +18,6 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # GITHUB_CONTEXT: ${{ toJson(github) }}
-      # GITHUB_EVENT_CONTEXT: ${{ toJson(github.event) }}
     strategy:
       fail-fast: false
     defaults:
@@ -53,7 +51,8 @@ jobs:
 
     - name: Terraform Init
       id: init
-      run: terraform init -backend-config="key=${{ secrets.TF_STATE_S3_LOCATION }}" -backend-config="region=${{ secrets.TF_STATE_FILE_BUCKET_REGION }}"
+      # Use a GitHub secret to pass in the S3 key location of the Terraform state file, e.g. appx_dev.tfstate.
+      run: terraform init -backend-config="key=${{ secrets.TF_STATE_S3_LOCATION }}"
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
@@ -61,7 +60,8 @@ jobs:
       id: plan
       if: github.event_name == 'pull_request'
       run: |
-        terraform plan -var-file="dev.tfvars" -no-color 2>&1 | tee /tmp/tfplan.txt
+        # NOTE that TF_VAR_FILE value is entire argument. e.g. -var-file="dev.tfvars"
+        terraform plan ${{ secrets.TF_VAR_FILE }} -no-color 2>&1 | tee /tmp/tfplan.txt
         sed -i '/Refreshing state.../d' /tmp/tfplan.txt
       continue-on-error: true
     - name: Update Pull Request with Terraform Plan output
@@ -101,7 +101,7 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
         # Write TF Apply output to a file:
-        terraform apply -auto-approve  -var-file="dev.tfvars" -no-color 2>&1 | tee /tmp/tfapply.txt
+        terraform apply -auto-approve  ${{ secrets.TF_VAR_FILE }} -no-color 2>&1 | tee /tmp/tfapply.txt
 
         # Remove lines showing TF state refreshes to reduce file size"
         sed -i '/Refreshing state.../d' /tmp/tfapply.txt
