@@ -68,7 +68,7 @@ jobs:
       continue-on-error: true
 
     - name: Update Pull Request with Terraform Plan output
-      uses: actions/github-script@1.0.0
+      uses: actions/github-script@v3.0.0
       if: github.event_name == 'pull_request'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
