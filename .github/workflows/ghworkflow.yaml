@@ -53,7 +53,7 @@ jobs:
 
     - name: Terraform Init
       id: init
-      run: terraform init
+      run: terraform init -backend-config="key=${{ secrets.TF_STATE_S3_LOCATION }}" -backend-config="region=${{ secrets.TF_STATE_FILE_BUCKET_REGION }}"
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
