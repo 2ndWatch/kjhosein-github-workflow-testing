@@ -88,7 +88,7 @@ jobs:
 
           </details>
 
-          <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: `${{ github.job }}`, GitHub Deployment Environment: \`prod\` </em> `;
+          <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
