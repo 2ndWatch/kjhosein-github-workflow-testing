@@ -75,7 +75,7 @@ jobs:
         script: |
           const fs = require("fs");
           const plan = fs.readFileSync("/tmp/tfplan.txt", "utf8");
-          const output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+          let output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
           #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
           #### Terraform Plan 📖 \`${{ steps.plan.outcome }}\`
           #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
