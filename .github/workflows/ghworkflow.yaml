@@ -90,7 +90,9 @@ jobs:
 
           <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
 
-          output +=  typeof(${{ steps.fmt.outputs.tf_fmt_output }});
+          if ("${{ steps.fmt.outputs.tf_fmt_output }}".length !== 0) {
+            output += `\n\n <strong>FYI: Terraform Format found issues. Please fix before applying.</strong>`;
+          }
 
           github.issues.createComment({
             issue_number: context.issue.number,
