@@ -24,8 +24,8 @@ terraform {
 
   backend "s3" {
     bucket  = "kjh-test-bucket-tagging"
-    key     = "terraform/tf-s3-object.state"
-    region  = "us-east-1"
-    profile = "kjh"
+    # key     = "terraform/tf-s3-object.state"
+    # region  = "us-east-1"
+    # profile = "kjh"
   }
 }
