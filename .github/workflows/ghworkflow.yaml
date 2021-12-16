@@ -47,7 +47,7 @@ jobs:
 
     - name: Terraform Format
       id: fmt
-      run: terraform fmt -diff
+      run: echo "::set-output name=tf_fmt_output::$(terraform fmt -diff)"
 
     - name: Terraform Init
       id: init
@@ -89,6 +89,10 @@ jobs:
           </details>
 
           <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
+
+          if (${{ steps.fmt.outputs.tf_fmt_output }} !== "") {
+            output += `\n\n <strong>FYI: Terraform Format found issues. Please fix before applying.</strong>`;
+          }
 
           github.issues.createComment({
             issue_number: context.issue.number,
