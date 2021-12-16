@@ -85,7 +85,7 @@ jobs:
 
           </details>
 
-          **Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job  ID: ${{ github.job }} ** `;
+          \*\*Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job  ID: ${{ github.job }} \*\* `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
@@ -126,7 +126,7 @@ jobs:
         tf_output=$(cat /tmp/tfapply.txt)
 
         # Create the initial body for the comment:
-        escaped_body="<details><summary>Show Terraform Apply:</summary>\n\n\`\`\`\n${tf_output} \n\`\`\`\n</details>\n\n **Pushed by @${{ github.actor }}. Workflow: \`${{ github.workflow }}\` **"
+        escaped_body="<details><summary>Show Terraform Apply:</summary>\n\n\`\`\`\n${tf_output} \n\`\`\`\n</details>\n\n \*\* Pushed by @${{ github.actor }}. Workflow: \`${{ github.workflow }}\` \*\*"
 
         # Un-escape comment body so it retains \n:
         printf -v unescaped_body %b "$escaped_body"
