@@ -17,6 +17,6 @@ resource "aws_s3_bucket_object" "file9" {
 
 # Outputs
 output "folder_id" {
-  value       = "Folder id is ${aws_s3_bucket_object.folder.id}"
+  value       =  "Folder id is ${aws_s3_bucket_object.folder.id}"
   description = "ID of the S3 object"
 }

@@ -47,15 +47,17 @@ jobs:
 
     - name: Terraform Format
       id: fmt
-      run: terraform fmt -check
+      run: terraform fmt -diff
 
     - name: Terraform Init
       id: init
       # Use a GitHub secret to pass in the S3 key location of the Terraform state file, e.g. appx_dev.tfstate.
       run: terraform init -backend-config="key=${{ secrets.TF_STATE_S3_LOCATION }}"
+
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
+
     - name: Terraform Plan
       id: plan
       if: github.event_name == 'pull_request'
@@ -64,6 +66,7 @@ jobs:
         terraform plan ${{ secrets.TF_VAR_FILE }} -no-color 2>&1 | tee /tmp/tfplan.txt
         sed -i '/Refreshing state.../d' /tmp/tfplan.txt
       continue-on-error: true
+
     - name: Update Pull Request with Terraform Plan output
       uses: actions/github-script@0.9.0
       if: github.event_name == 'pull_request'
@@ -85,7 +88,7 @@ jobs:
 
           </details>
 
-          <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Environment: \`prod\`, Job  ID: ${{ github.job }} </em> `;
+          <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: `${{ github.job }}`, GitHub Deployment Environment: \`prod\` </em> `;
 
           github.issues.createComment({
             issue_number: context.issue.number,
@@ -93,9 +96,11 @@ jobs:
             repo: context.repo.repo,
             body: output
           })
+
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
       run: exit 1
+
     - name: Terraform Apply
       id: apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -108,6 +113,7 @@ jobs:
 
         # Remove any TF Outputs at the end:
         sed -i '/Outputs/Q' /tmp/tfapply.txt
+
     - name: Get Pull Request Number
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: jwalton/gh-find-current-pr@v1
@@ -126,7 +132,7 @@ jobs:
         tf_output=$(cat /tmp/tfapply.txt)
 
         # Create the initial body for the comment:
-        escaped_body="<details><summary>Show Terraform Apply:</summary>\n\n\`\`\`\n${tf_output} \n\`\`\`\n</details>\n\n <em> Pushed by @${{ github.actor }}. Workflow: \`${{ github.workflow }}\` </em>"
+        escaped_body="<details><summary>Show Terraform Apply:</summary>\n\n\`\`\`\n${tf_output} \n\`\`\`\n</details>\n\n <em> Pushed by @${{ github.actor }}. Workflow: \`${{ github.workflow }}\`, GitHub Deployment Environment: \`prod\` </em>"
 
         # Un-escape comment body so it retains \n:
         printf -v unescaped_body %b "$escaped_body"
