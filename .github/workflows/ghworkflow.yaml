@@ -90,7 +90,7 @@ jobs:
 
           <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
 
-          const tf_format_output = "${{ steps.fmt.outputs.tf_fmt_output }}";
+          let tf_format_output = "${{ steps.fmt.outputs.tf_fmt_output }}";
           if (tf_format_output.length !== 0) {
             output += `\n\n <strong>FYI: Terraform Format found issues. Please fix before applying.</strong>`;
           }
