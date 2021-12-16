@@ -90,8 +90,8 @@ jobs:
 
           <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
 
-          var tf_format_output = `${{ steps.fmt.outputs.tf_fmt_output }}`;
-          output += typeof(tf_format_output);
+          console.log(${{ steps.fmt.outputs.tf_fmt_output }});
+          
 
 
           github.issues.createComment({
