@@ -68,7 +68,7 @@ jobs:
       continue-on-error: true
 
     - name: Update Pull Request with Terraform Plan output
-      uses: actions/github-script@0.9.0
+      uses: actions/github-script@1.0.0
       if: github.event_name == 'pull_request'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -93,6 +93,7 @@ jobs:
           let tf_format_output = "${{ steps.fmt.outputs.tf_fmt_output }}";
           if (tf_format_output.length !== 0) {
             output += `\n\n <strong>FYI: Terraform Format found issues. Please fix before applying.</strong>`;
+            output += typeof(tf_format_output);
           }
 
           github.issues.createComment({
