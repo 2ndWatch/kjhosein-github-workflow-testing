@@ -91,8 +91,7 @@ jobs:
           <em>Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`, Job ID: \`${{ github.job }}\`, GitHub Deployment Environment: \`prod\` </em> `;
 
           console.log("${{ steps.fmt.outputs.tf_fmt_output }}");
-          
-
+          var test_var = "test_var";
 
           github.issues.createComment({
             issue_number: context.issue.number,
